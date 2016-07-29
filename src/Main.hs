@@ -1,20 +1,19 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-|
+  Module      : Main.hs
+  Description : murl Main execution
+  Copyright   : (c) 2016 murl developers
+  License     : MIT
+  
+  Maintainer  : alunduil@alunduil.com
+  Stability   : experimental
+  Portability : portable
+-}
 
 module Main where
 
-import Control.Applicative()
-import Snap.Core
-import Snap.Util.FileServe()
-import Snap.Http.Server
+import Api
+import Network.Wai.Handler.Warp
+import Servant
 
 main :: IO ()
-main = quickHttpServe site
-
-site :: Snap ()
-site = route [ ( ":urlid", urlHandler ) ]
-
-urlHandler :: Snap ()
-urlHandler = do
-    urlid <- getParam "urlid"
-    maybe ( writeBS "must specify an ID" )
-          writeBS urlid
+main = run 8000 murlApplication

@@ -1,34 +1,54 @@
 name:               murl
 version:            0.1.0.0
+
 synopsis:           Micro-URL API—URL Shortener
--- description:
+description:        Servant based URL shortening service.  Small and featureless.
+
+homepage:           https://github.com/alunduil/murl
+
 license:            MIT
 license-file:       LICENSE
+
 author:             Alex Brandt
 maintainer:         alunduil@alunduil.com
--- copyright:
-stability:          Experimental
+
+copyright:          (c) 2016 murl developers
+
 category:           Web
+
 build-type:         Simple
-cabal-version:      >=1.2
+
+-- Extra files to be distributed with the package, such as examples or a 
+-- README.
+-- extra-source-files:  
+
+-- Constraint on the version of Cabal needed to build this package.
+cabal-version:      >=1.10
+
+source-repository head
+  type:     git
+  location: git://github.com/alunduil/murl.git
 
 executable murl
-  hs-source-dirs:   src
-  main-is:          Main.hs
-  -- other-modules:
-  -- other-extensions:
-  default-language: Haskell2010
+  main-is:             Main.hs
 
-  build-depends:
-    base                      >= 4     && < 5,
-    bytestring                >= 0.9.1 && < 0.11,
-    MonadCatchIO-transformers >= 0.2.1 && < 0.4,
-    mtl                       >= 2     && < 3,
-    snap-core                 >= 0.9   && < 0.10,
-    snap-server               >= 0.9   && < 0.10
+  -- Modules included in this executable, other than Main.
+  -- other-modules:       
+  
+  -- LANGUAGE extensions used by modules in this package.
+  -- other-extensions:    
+  
+  -- Other library packages from which modules are imported.
+  build-depends:       aeson          ==0.11.*,
+                       base           ==4.8.*,
+                       containers     ==0.5.*,
+                       servant-server ==0.8.*,
+                       stm            ==2.4.*,
+                       transformers   ==0.4.*,
+                       warp           ==3.2.*
 
-  if impl(ghc >= 6.12.0)
-    ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
-                 -fno-warn-unused-do-bind
-  else
-    ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
+  -- Directories containing source files.
+  hs-source-dirs:      src
+
+  -- Base language which the package is written in.
+  default-language:    Haskell2010
