@@ -11,9 +11,8 @@
 
 module Main where
 
-import Api
-import Network.Wai.Handler.Warp
-import Servant
+import Murl.Api (application)
+import Network.Wai.Handler.Warp (run)
 
 main :: IO ()
-main = run 8000 murlApplication
+main = run 8000 application

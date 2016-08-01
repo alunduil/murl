@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeOperators #-}
 
 {-|
-  Module      : Api.hs
+  Module      : Murl.Api.hs
   Description : murl API specification
   Copyright   : (c) 2016 murl developers
   License     : MIT
@@ -12,18 +12,18 @@
   Portability : portable
 -}
 
-module Api where
+module Murl.Api (application) where
 
-import Api.Statuses
+import qualified Murl.Api.Statuses as Statuses
 import Servant
 
-type MurlApi = StatusApi
+application :: Application
+application = serve api server
 
-murlServer :: Server MurlApi
-murlServer = statusesServer
+type Api = Statuses.Api
 
-murlApplication :: Application
-murlApplication = serve murlApi murlServer
+api :: Proxy Api
+api = Proxy
 
-murlApi :: Proxy MurlApi
-murlApi = Proxy
+server :: Server Api
+server = Statuses.server

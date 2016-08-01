@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeOperators #-}
 
 {-|
-  Module      : Api.Statuses
+  Module      : Murl.Api.Statuses
   Description : murl status API specification
   Copyright   : (c) 2016 murl developers
   License     : MIT
@@ -12,11 +12,11 @@
   Portability : portable
 -}
 
-module Api.Statuses where
+module Murl.Api.Statuses where
 
 import Servant
 
-type StatusApi = "statuses" :> "ping" :> Get '[PlainText] String
+type Api = "statuses" :> "ping" :> Get '[PlainText] String
 
-statusesServer :: Server StatusApi
-statusesServer = return "pong"
+server :: Server Api
+server = return "pong"

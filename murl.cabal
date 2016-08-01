@@ -2,7 +2,8 @@ name:               murl
 version:            0.1.0.0
 
 synopsis:           Micro-URL API—URL Shortener
-description:        Servant based URL shortening service.  Small and featureless.
+description:        
+  Servant based URL shortening service.  Small and featureless.
 
 homepage:           https://github.com/alunduil/murl
 
@@ -18,11 +19,8 @@ category:           Web
 
 build-type:         Simple
 
--- Extra files to be distributed with the package, such as examples or a 
--- README.
 -- extra-source-files:  
 
--- Constraint on the version of Cabal needed to build this package.
 cabal-version:      >=1.10
 
 source-repository head
@@ -30,25 +28,21 @@ source-repository head
   location: git://github.com/alunduil/murl.git
 
 executable murl
-  main-is:             Main.hs
+  hs-source-dirs:   src
+  main-is:          Main.hs
 
-  -- Modules included in this executable, other than Main.
-  -- other-modules:       
+  default-language: Haskell2010
+
+  other-modules:    Murl.Api
+                    Murl.Api.Statuses
   
-  -- LANGUAGE extensions used by modules in this package.
-  -- other-extensions:    
+  other-extensions: DataKinds,
+                    TypeOperators
   
-  -- Other library packages from which modules are imported.
-  build-depends:       aeson          ==0.11.*,
-                       base           ==4.8.*,
-                       containers     ==0.5.*,
-                       servant-server ==0.8.*,
-                       stm            ==2.4.*,
-                       transformers   ==0.4.*,
-                       warp           ==3.2.*
-
-  -- Directories containing source files.
-  hs-source-dirs:      src
-
-  -- Base language which the package is written in.
-  default-language:    Haskell2010
+  build-depends:    aeson          ==0.11.*,
+                    base           ==4.8.*,
+                    containers     ==0.5.*,
+                    servant-server ==0.8.*,
+                    stm            ==2.4.*,
+                    transformers   ==0.4.*,
+                    warp           ==3.2.*
