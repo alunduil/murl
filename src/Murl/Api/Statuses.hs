@@ -14,9 +14,13 @@
 
 module Murl.Api.Statuses where
 
+import Data.Version
+import Paths_murl
 import Servant
 
 type Api = "statuses" :> "ping" :> Get '[PlainText] String
+      :<|> "statuses" :> "version" :> Get '[PlainText] String
 
 server :: Server Api
 server = return "pong"
+    :<|> return (showVersion version)

@@ -19,6 +19,7 @@ category:           Web
 
 build-type:         Simple
 
+-- data-files:         
 -- extra-source-files:  
 
 cabal-version:      >=1.10
@@ -35,6 +36,7 @@ executable murl
 
   other-modules:    Murl.Api
                     Murl.Api.Statuses
+                    Paths_murl
   
   other-extensions: DataKinds,
                     TypeOperators
