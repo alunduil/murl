@@ -16,7 +16,8 @@
 
 module Murl.Api.Urls (
   Api,
-  server
+  server,
+  shorten
 ) where
 
 import Control.Monad.IO.Class
@@ -29,58 +30,58 @@ import qualified Data.Hashable as H
 import GHC.Generics
 import Network.HTTP.Types (hLocation)
 import Servant
-import qualified Stores
+import qualified Murl.Store.Urls as Store
 
-type CreateUrl = "urls" :> QueryParam "long" Stores.LongUrl :> Put '[JSON] Url
-type ReadUrl = "urls" :> Capture "short" Stores.ShortUrl :> Get '[JSON] Url
-          :<|> "urls" :> Capture "long" Stores.LongUrl :> Get '[JSON] Url
-type DeleteUrl = "urls" :> Capture "short" Stores.ShortUrl :> Delete '[JSON] NoContent
-type RedirectUrl = Capture "short" Stores.ShortUrl :> (Verb GET 301) '[JSON] (Headers '[Header "Location" Stores.LongUrl] NoContent)
+type CreateUrl = "urls" :> QueryParam "long" Store.LongUrl :> Put '[JSON] Url
+type ReadUrl = "urls" :> Capture "short" Store.ShortUrl :> Get '[JSON] Url
+          :<|> "urls" :> Capture "long" Store.LongUrl :> Get '[JSON] Url
+type DeleteUrl = "urls" :> Capture "short" Store.ShortUrl :> Delete '[JSON] NoContent
+type RedirectUrl = Capture "short" Store.ShortUrl :> (Verb GET 301) '[JSON] (Headers '[Header "Location" Store.LongUrl] NoContent)
 
 type Api = CreateUrl :<|> ReadUrl :<|> DeleteUrl :<|> RedirectUrl
 
 data Url = Url {
-  long :: Stores.LongUrl,
-  short :: Stores.ShortUrl
+  long :: Store.LongUrl,
+  short :: Store.ShortUrl
 } deriving (Eq, Show, FromJSON, ToJSON, Generic)
 
-server :: Stores.UrlMap -> Server Api
+server :: Store.UrlMap -> Server Api
 server s = create s
       :<|> Murl.Api.Urls.read s
       :<|> delete s
       :<|> redirect s
 
-create :: Stores.UrlMap -> Server CreateUrl
+create :: Store.UrlMap -> Server CreateUrl
 create s (Just lurl) = do
                        liftIO $ putStrLn $ "PUT /urls/" ++ show lurl
-                       liftIO $ Stores.storeUrl s surl lurl
+                       liftIO $ Store.storeUrl s surl lurl
                        return Url { long = lurl, short = surl }
                        where surl = shorten lurl
 create s Nothing = throwError err400 { errReasonPhrase = "long query paramter must be passed" }
 
-read :: Stores.UrlMap -> Server ReadUrl
+read :: Store.UrlMap -> Server ReadUrl
 read s = readShort :<|> readLong
-         where readShort :: Stores.ShortUrl -> Handler Url
+         where readShort :: Store.ShortUrl -> Handler Url
                readShort surl = do
                                 liftIO $ putStrLn $ "GET /urls/" ++ show surl
-                                (liftIO $ Stores.shortToLong s surl) >>= maybe (throwError err404) (return . (flip Url) surl)
-               readLong :: Stores.LongUrl -> Handler Url
+                                liftIO (Store.shortToLong s surl) >>= maybe (throwError err404) (return . flip Url surl)
+               readLong :: Store.LongUrl -> Handler Url
                readLong lurl = do
                                liftIO $ putStrLn $ "GET /urls/" ++ show lurl
-                               (liftIO $ Stores.longToShort s lurl) >>= maybe (throwError err404) (return . Url lurl)
+                               liftIO (Store.longToShort s lurl) >>= maybe (throwError err404) (return . Url lurl)
 
-delete :: Stores.UrlMap -> Server DeleteUrl
+delete :: Store.UrlMap -> Server DeleteUrl
 delete s surl = do
                 liftIO $ putStrLn $ "DELETE /urls/" ++ show surl
-                liftIO $ Stores.removeShortUrl s surl >> return undefined
+                liftIO $ Store.removeShortUrl s surl >> return undefined
 
-redirect :: Stores.UrlMap -> Server RedirectUrl
+redirect :: Store.UrlMap -> Server RedirectUrl
 redirect s surl = do
                   liftIO $ putStrLn $ "GET /" ++ show surl
-                  lurl <- liftIO $ Stores.shortToLong s surl
+                  lurl <- liftIO $ Store.shortToLong s surl
                   case lurl of
                        Just lurl' -> return $ addHeader lurl' undefined
                        Nothing -> throwError err404
 
-shorten :: Stores.LongUrl -> Stores.ShortUrl
-shorten (Stores.LongUrl s) = Stores.ShortUrl . show . B64.encode . L.toStrict . B.encode . H.hash $ s
+shorten :: Store.LongUrl -> Store.ShortUrl
+shorten (Store.LongUrl s) = Store.ShortUrl . init . tail . show . B64.encode . L.toStrict . B.encode . H.hash $ s

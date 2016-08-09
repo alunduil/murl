@@ -17,9 +17,9 @@ module Murl.Api (application) where
 import qualified Murl.Api.Statuses as Statuses
 import qualified Murl.Api.Urls as Urls
 import Servant
-import qualified Stores
+import qualified Murl.Store.Urls as Store
 
-application :: Stores.UrlMap -> Application
+application :: Store.UrlMap -> Application
 application s = serve api (server s)
 
 type Api = Statuses.Api
@@ -28,6 +28,6 @@ type Api = Statuses.Api
 api :: Proxy Api
 api = Proxy
 
-server :: Stores.UrlMap -> Server Api
+server :: Store.UrlMap -> Server Api
 server s = Statuses.server
       :<|> Urls.server s

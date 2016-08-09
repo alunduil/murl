@@ -12,7 +12,7 @@
   Portability : portable
 -}
 
-module Stores where
+module Murl.Store.Urls where
 
 import Data.Aeson.Types
 import Control.Concurrent.STM

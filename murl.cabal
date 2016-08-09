@@ -28,22 +28,21 @@ source-repository head
   type:     git
   location: git://github.com/alunduil/murl.git
 
-executable murl
+library
   hs-source-dirs:   src
-  main-is:          Main.hs
-
   default-language: Haskell2010
 
-  other-modules:    Murl.Api
-                    Murl.Api.Statuses
-                    Murl.Api.Urls
-                    Paths_murl
-                    Stores
-  
   other-extensions: DataKinds,
                     DeriveGeneric
                     TypeOperators
-  
+
+  exposed-modules:  Murl.Api
+                    Murl.Api.Statuses
+                    Murl.Api.Urls
+                    Murl.Store.Urls
+
+  other-modules:    Paths_murl
+
   build-depends:    aeson                 ==0.11.*,
                     base                  ==4.8.*,
                     base64-bytestring     ==1.0.*,
@@ -51,12 +50,51 @@ executable murl
                     binary                ==0.7.*,
                     bytestring            ==0.10.*,
                     bytestring-conversion ==0.3.*,
-                    containers            ==0.5.*,
                     exceptions            ==0.8.*,
                     hashable              ==1.2.*,
                     http-api-data         ==0.2.*,
                     http-types            ==0.9.*,
-                    servant-server        ==0.8.*,
+                    servant-server        ==0.8,
+                    stm                   ==2.4.*,
+                    transformers          ==0.4.*
+                    
+executable murl
+  hs-source-dirs:   src
+  main-is:          Main.hs
+
+  default-language: Haskell2010
+
+  other-extensions: TemplateHaskell
+
+  build-depends:    aeson                 ==0.11.*,
+                    base                  ==4.8.*,
+                    base64-bytestring     ==1.0.*,
+                    bimap                 ==0.3.*,
+                    binary                ==0.7.*,
+                    bytestring            ==0.10.*,
+                    bytestring-conversion ==0.3.*,
+                    exceptions            ==0.8.*,
+                    hashable              ==1.2.*,
+                    http-api-data         ==0.2.*,
+                    http-types            ==0.9.*,
+                    murl,
+                    servant-server        ==0.8,
                     stm                   ==2.4.*,
                     transformers          ==0.4.*,
-                    warp                  ==3.2.*
+                    warp                  ==3.*
+
+test-suite test-murl
+  type:             exitcode-stdio-1.0
+  hs-source-dirs:   tests/murl
+  main-is:          Main.hs
+
+  default-language: Haskell2010
+
+  other-modules:    Tests.Murl.Api.Urls
+
+  build-depends:    base                       ==4.8.*,
+                    murl,
+                    QuickCheck                 ==2.8.*,
+                    test-framework             ==0.8.*,
+                    test-framework-quickcheck2 ==0.3.*,
+                    test-framework-th          ==0.2.*
