@@ -44,7 +44,7 @@ library
   other-modules:    Paths_murl
 
   build-depends:    aeson                 ==0.11.*,
-                    base                  ==4.8.*,
+                    base                  >=4.7.0.0 && <4.9.0.0,
                     base64-bytestring     ==1.0.*,
                     bimap                 ==0.3.*,
                     binary                ==0.7.*,
@@ -67,7 +67,7 @@ executable murl
   other-extensions: TemplateHaskell
 
   build-depends:    aeson                 ==0.11.*,
-                    base                  ==4.8.*,
+                    base                  >=4.7.0.0 && <4.9.0.0,
                     base64-bytestring     ==1.0.*,
                     bimap                 ==0.3.*,
                     binary                ==0.7.*,
@@ -92,7 +92,7 @@ test-suite test-murl
 
   other-modules:    Tests.Murl.Api.Urls
 
-  build-depends:    base                       ==4.8.*,
+  build-depends:    base                       >=4.7.0.0 && <4.9.0.0,
                     murl,
                     QuickCheck                 ==2.8.*,
                     test-framework             ==0.8.*,
