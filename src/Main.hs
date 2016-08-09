@@ -13,6 +13,9 @@ module Main where
 
 import Murl.Api (application)
 import Network.Wai.Handler.Warp (run)
+import qualified Stores
 
 main :: IO ()
-main = run 8000 application
+main = do
+  s <- Stores.newUrlMap
+  run 8000 (application s)

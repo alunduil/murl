@@ -36,15 +36,27 @@ executable murl
 
   other-modules:    Murl.Api
                     Murl.Api.Statuses
+                    Murl.Api.Urls
                     Paths_murl
+                    Stores
   
   other-extensions: DataKinds,
+                    DeriveGeneric
                     TypeOperators
   
-  build-depends:    aeson          ==0.11.*,
-                    base           ==4.8.*,
-                    containers     ==0.5.*,
-                    servant-server ==0.8.*,
-                    stm            ==2.4.*,
-                    transformers   ==0.4.*,
-                    warp           ==3.2.*
+  build-depends:    aeson                 ==0.11.*,
+                    base                  ==4.8.*,
+                    base64-bytestring     ==1.0.*,
+                    bimap                 ==0.3.*,
+                    binary                ==0.7.*,
+                    bytestring            ==0.10.*,
+                    bytestring-conversion ==0.3.*,
+                    containers            ==0.5.*,
+                    exceptions            ==0.8.*,
+                    hashable              ==1.2.*,
+                    http-api-data         ==0.2.*,
+                    http-types            ==0.9.*,
+                    servant-server        ==0.8.*,
+                    stm                   ==2.4.*,
+                    transformers          ==0.4.*,
+                    warp                  ==3.2.*

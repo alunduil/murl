@@ -18,8 +18,10 @@ import Data.Version
 import Paths_murl
 import Servant
 
-type Api = "statuses" :> "ping" :> Get '[PlainText] String
-      :<|> "statuses" :> "version" :> Get '[PlainText] String
+type Api = "statuses" :> (
+                  "ping" :> Get '[PlainText] String
+             :<|> "version" :> Get '[PlainText] String
+           )
 
 server :: Server Api
 server = return "pong"

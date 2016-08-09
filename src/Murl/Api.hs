@@ -15,15 +15,19 @@
 module Murl.Api (application) where
 
 import qualified Murl.Api.Statuses as Statuses
+import qualified Murl.Api.Urls as Urls
 import Servant
+import qualified Stores
 
-application :: Application
-application = serve api server
+application :: Stores.UrlMap -> Application
+application s = serve api (server s)
 
 type Api = Statuses.Api
+      :<|> Urls.Api
 
 api :: Proxy Api
 api = Proxy
 
-server :: Server Api
-server = Statuses.server
+server :: Stores.UrlMap -> Server Api
+server s = Statuses.server
+      :<|> Urls.server s
