@@ -49,7 +49,7 @@ removeShortUrl :: UrlMap -> ShortUrl -> IO ()
 removeShortUrl s surl = atomically $ modifyTVar s (M.delete surl)
 
 shortToLong :: UrlMap -> ShortUrl -> IO (Maybe LongUrl)
-shortToLong s surl = atomically $ readTVar s >>= return . (M.lookup surl)
+shortToLong s surl = atomically $ M.lookup surl <$> readTVar s
 
 longToShort :: UrlMap -> LongUrl -> IO (Maybe ShortUrl)
-longToShort s lurl = atomically $ readTVar s >>= return . (M.lookupR lurl)
+longToShort s lurl = atomically $ M.lookupR lurl <$> readTVar s

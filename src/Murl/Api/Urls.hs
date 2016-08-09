@@ -63,17 +63,11 @@ read s = readShort :<|> readLong
          where readShort :: Stores.ShortUrl -> Handler Url
                readShort surl = do
                                 liftIO $ putStrLn $ "GET /urls/" ++ show surl
-                                lurl <- liftIO $ Stores.shortToLong s surl
-                                case lurl of
-                                     Just lurl' -> return Url { long = lurl', short = surl }
-                                     Nothing -> throwError err404
+                                (liftIO $ Stores.shortToLong s surl) >>= maybe (throwError err404) (return . (flip Url) surl)
                readLong :: Stores.LongUrl -> Handler Url
                readLong lurl = do
                                liftIO $ putStrLn $ "GET /urls/" ++ show lurl
-                               surl <- liftIO $ Stores.longToShort s lurl
-                               case surl of
-                                    Just surl' -> return Url { long = lurl, short = surl' }
-                                    Nothing -> throwError err404
+                               (liftIO $ Stores.longToShort s lurl) >>= maybe (throwError err404) (return . Url lurl)
 
 delete :: Stores.UrlMap -> Server DeleteUrl
 delete s surl = do
