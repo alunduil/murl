@@ -17,5 +17,5 @@ import qualified Murl.Store.Urls as Store
 
 main :: IO ()
 main = do
-  s <- Store.newUrlMap
+  s <- Store.empty
   run 8000 (application s)

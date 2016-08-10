@@ -5,15 +5,17 @@
 
 {-|
   Module      : Murl.Api.Urls
-  Description : murl URL API specification
+  Description : URL shortening API implementation.
   Copyright   : (c) 2016 murl developers
   License     : MIT
-  
   Maintainer  : alunduil@alunduil.com
   Stability   : experimental
   Portability : portable
--}
 
+  A basic no-frills URL shortening API implementation.  This API does *not*
+  include authentication or other niceties included in shortening services
+  such as goo.gl.
+-}
 module Murl.Api.Urls (
   Api,
   server,
@@ -33,11 +35,12 @@ import Servant
 import qualified Murl.Store.Urls as Store
 
 type CreateUrl = "urls" :> QueryParam "long" Store.LongUrl :> Put '[JSON] Url
-type ReadUrl = "urls" :> Capture "short" Store.ShortUrl :> Get '[JSON] Url
-          :<|> "urls" :> Capture "long" Store.LongUrl :> Get '[JSON] Url
-type DeleteUrl = "urls" :> Capture "short" Store.ShortUrl :> Delete '[JSON] NoContent
+type ReadUrl = "urls" :> QueryParam "short" Store.ShortUrl :> Get '[JSON] Url
+          :<|> "urls" :> QueryParam "long" Store.LongUrl :> Get '[JSON] Url
+type DeleteUrl = "urls" :> QueryParam "short" Store.ShortUrl :> Delete '[JSON] NoContent
 type RedirectUrl = Capture "short" Store.ShortUrl :> (Verb GET 301) '[JSON] (Headers '[Header "Location" Store.LongUrl] NoContent)
 
+-- | URL shortening API.
 type Api = CreateUrl :<|> ReadUrl :<|> DeleteUrl :<|> RedirectUrl
 
 data Url = Url {
@@ -45,6 +48,7 @@ data Url = Url {
   short :: Store.ShortUrl
 } deriving (Eq, Show, FromJSON, ToJSON, Generic)
 
+-- | URL shortening server.
 server :: Store.UrlMap -> Server Api
 server s = create s
       :<|> Murl.Api.Urls.read s
@@ -57,23 +61,26 @@ create s (Just lurl) = do
                        liftIO $ Store.storeUrl s surl lurl
                        return Url { long = lurl, short = surl }
                        where surl = shorten lurl
-create s Nothing = throwError err400 { errReasonPhrase = "long query paramter must be passed" }
+create s Nothing = throwError $ missingQueryParam "long"
 
 read :: Store.UrlMap -> Server ReadUrl
 read s = readShort :<|> readLong
-         where readShort :: Store.ShortUrl -> Handler Url
-               readShort surl = do
-                                liftIO $ putStrLn $ "GET /urls/" ++ show surl
-                                liftIO (Store.shortToLong s surl) >>= maybe (throwError err404) (return . flip Url surl)
-               readLong :: Store.LongUrl -> Handler Url
-               readLong lurl = do
-                               liftIO $ putStrLn $ "GET /urls/" ++ show lurl
-                               liftIO (Store.longToShort s lurl) >>= maybe (throwError err404) (return . Url lurl)
+         where readShort :: Maybe Store.ShortUrl -> Handler Url
+               readShort (Just surl) = do
+                                       liftIO $ putStrLn $ "GET /urls/" ++ show surl
+                                       liftIO (Store.shortToLong s surl) >>= maybe (throwError err404) (return . flip Url surl)
+               readShort Nothing = throwError $ missingQueryParam "short"
+               readLong :: Maybe Store.LongUrl -> Handler Url
+               readLong (Just lurl) = do
+                                      liftIO $ putStrLn $ "GET /urls/" ++ show lurl
+                                      liftIO (Store.longToShort s lurl) >>= maybe (throwError err404) (return . Url lurl)
+               readLong Nothing = throwError $ missingQueryParam "long"
 
 delete :: Store.UrlMap -> Server DeleteUrl
-delete s surl = do
-                liftIO $ putStrLn $ "DELETE /urls/" ++ show surl
-                liftIO $ Store.removeShortUrl s surl >> return undefined
+delete s (Just surl) = do
+                       liftIO $ putStrLn $ "DELETE /urls/" ++ show surl
+                       liftIO $ Store.removeShortUrl s surl >> return undefined
+delete s Nothing = throwError $ missingQueryParam "short"
 
 redirect :: Store.UrlMap -> Server RedirectUrl
 redirect s surl = do
@@ -83,5 +90,9 @@ redirect s surl = do
                        Just lurl' -> return $ addHeader lurl' undefined
                        Nothing -> throwError err404
 
+-- | Shorten a LongUrl into a ShortUrl.
 shorten :: Store.LongUrl -> Store.ShortUrl
 shorten (Store.LongUrl s) = Store.ShortUrl . init . tail . show . B64.encode . L.toStrict . B.encode . H.hash $ s
+
+missingQueryParam :: String -> ServantErr
+missingQueryParam p = err400 { errReasonPhrase = p ++ " query parameter must be passed" }
