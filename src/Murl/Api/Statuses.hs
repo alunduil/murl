@@ -20,10 +20,9 @@ import Paths_murl
 import Servant
 
 -- | Statuses API.
-type Api = "statuses" :> (
-                  "ping" :> Get '[PlainText] String
-             :<|> "version" :> Get '[PlainText] String
-           )
+type Api = "statuses" :> (    "ping" :> Get '[PlainText] String
+                         :<|> "version" :> Get '[PlainText] String
+                         )
 
 -- | Stauses server.
 server :: Server Api

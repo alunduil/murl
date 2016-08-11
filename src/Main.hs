@@ -12,10 +12,10 @@
 module Main where
 
 import Murl.Api (application)
-import Network.Wai.Handler.Warp (run)
 import qualified Murl.Store.Urls as Store
+import Network.Wai.Handler.Warp (run)
 
 main :: IO ()
 main = do
-  s <- Store.empty
-  run 8000 (application s)
+       s <- Store.empty
+       run 8000 (application s)

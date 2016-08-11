@@ -12,15 +12,14 @@
 
   The composed and complete API for murl.
 -}
-module Murl.Api (
-  api,
-  application
-) where
+module Murl.Api ( api
+                , application
+                ) where
 
 import qualified Murl.Api.Statuses as Statuses
 import qualified Murl.Api.Urls as Urls
-import Servant
 import qualified Murl.Store.Urls as Store
+import Servant
 
 -- | murl API application.
 application :: Store.UrlMap -> Application

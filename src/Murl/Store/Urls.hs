@@ -12,33 +12,37 @@
 -}
 module Murl.Store.Urls where
 
-import Data.Aeson.Types
 import Control.Concurrent.STM
 import Control.Monad.Catch (MonadThrow)
+import Data.Aeson.Types
 import qualified Data.Bimap as M
 import Data.ByteString.Conversion.To (ToByteString(..))
+import qualified Data.Text as T
 import GHC.Generics
 import Web.HttpApiData (FromHttpApiData(..))
 
 -- | A long URL.
 data LongUrl = LongUrl String
-  deriving (Eq, Show, FromJSON, ToJSON, Ord, Generic)
+  deriving ( Eq, Ord, Show
+           , Generic
+           , FromJSON, ToJSON
+           )
 
 instance FromHttpApiData LongUrl where
-  parseUrlPiece = Right . LongUrl . unquote . show
+  parseUrlPiece = Right . LongUrl . T.unpack
 
 instance ToByteString LongUrl where
   builder (LongUrl s) = builder s
 
 -- | A short URL.
 data ShortUrl = ShortUrl String
-  deriving (Eq, Show, FromJSON, ToJSON, Ord, Generic)
+  deriving ( Eq, Ord, Show
+           , Generic
+           , FromJSON, ToJSON
+           )
 
 instance FromHttpApiData ShortUrl where
-  parseUrlPiece = Right . ShortUrl . unquote . show
-
-unquote :: String -> String
-unquote = init . tail
+  parseUrlPiece = Right . ShortUrl . T.unpack
 
 -- | A bidirectional map between ShortUrls and LongUrls.
 type UrlMap = TVar (M.Bimap ShortUrl LongUrl)
