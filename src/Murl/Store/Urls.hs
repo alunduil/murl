@@ -25,7 +25,7 @@ data LongUrl = LongUrl String
   deriving (Eq, Show, FromJSON, ToJSON, Ord, Generic)
 
 instance FromHttpApiData LongUrl where
-  parseUrlPiece = Right . LongUrl . show
+  parseUrlPiece = Right . LongUrl . unquote . show
 
 instance ToByteString LongUrl where
   builder (LongUrl s) = builder s
@@ -35,7 +35,10 @@ data ShortUrl = ShortUrl String
   deriving (Eq, Show, FromJSON, ToJSON, Ord, Generic)
 
 instance FromHttpApiData ShortUrl where
-  parseUrlPiece = Right . ShortUrl . show
+  parseUrlPiece = Right . ShortUrl . unquote . show
+
+unquote :: String -> String
+unquote = init . tail
 
 -- | A bidirectional map between ShortUrls and LongUrls.
 type UrlMap = TVar (M.Bimap ShortUrl LongUrl)
