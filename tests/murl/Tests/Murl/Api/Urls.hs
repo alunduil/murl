@@ -5,7 +5,7 @@
   Description : murl URL API tests
   Copyright   : (c) 2016 murl developers
   License     : MIT
-  
+
   Maintainer  : alunduil@alunduil.com
   Stability   : experimental
   Portability : portable
@@ -24,6 +24,14 @@ instance Arbitrary Store.LongUrl where
   arbitrary = liftM Store.LongUrl arbitrary
 
 prop_shorten_fixed_length x = 12 == (length . fromShort . shorten $ x)
-                              where fromShort (Store.ShortUrl s) = s
+
+prop_shorten_unquoted x = not . quoted . fromShort . shorten $ x
+                          where quoted :: String -> Bool
+                                quoted ('"':cs) | last cs == '"' = True
+                                quoted ('\'':cs) | last cs == '\'' = True
+                                quoted _ = False
+
+fromShort :: Store.ShortUrl -> String
+fromShort (Store.ShortUrl s) = s
 
 tests = $(testGroupGenerator)

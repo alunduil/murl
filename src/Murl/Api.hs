@@ -12,7 +12,10 @@
 
   The composed and complete API for murl.
 -}
-module Murl.Api (application) where
+module Murl.Api (
+  api,
+  application
+) where
 
 import qualified Murl.Api.Statuses as Statuses
 import qualified Murl.Api.Urls as Urls
@@ -23,6 +26,7 @@ import qualified Murl.Store.Urls as Store
 application :: Store.UrlMap -> Application
 application s = serve api (server s)
 
+-- | murl API proxy object (used for servant derivations).
 type Api = Statuses.Api
       :<|> Urls.Api
 

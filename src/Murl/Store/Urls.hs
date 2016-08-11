@@ -46,7 +46,9 @@ empty = newTVarIO M.empty
 
 -- | Insert a (ShortUrl, LongUrl) pair into UrlMap.
 storeUrl :: UrlMap -> ShortUrl -> LongUrl -> IO ()
-storeUrl s surl lurl = atomically $ modifyTVar s (M.insert surl lurl)
+storeUrl s surl lurl = do
+                       putStrLn $ "store: " ++ show surl ++ " -> " ++ show lurl
+                       atomically $ modifyTVar s (M.insert surl lurl)
 
 -- | Remove ShortUrl (and corresponding LongUrl) from UrlMap.
 removeShortUrl :: UrlMap -> ShortUrl -> IO ()
@@ -54,8 +56,12 @@ removeShortUrl s surl = atomically $ modifyTVar s (M.delete surl)
 
 -- | Lookup ShortUrl, returning the corresponding LongUrl.
 shortToLong :: UrlMap -> ShortUrl -> IO (Maybe LongUrl)
-shortToLong s surl = atomically $ M.lookup surl <$> readTVar s
+shortToLong s surl = do
+                     putStrLn $ "lookup short: " ++ show surl
+                     atomically $ M.lookup surl <$> readTVar s
 
 -- | Lookup LongUrl, returning the corresponding ShortUrl.
 longToShort :: UrlMap -> LongUrl -> IO (Maybe ShortUrl)
-longToShort s lurl = atomically $ M.lookupR lurl <$> readTVar s
+longToShort s lurl = do
+                     putStrLn $ "lookup long: " ++ show lurl
+                     atomically $ M.lookupR lurl <$> readTVar s

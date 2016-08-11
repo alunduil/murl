@@ -86,6 +86,7 @@ redirect :: Store.UrlMap -> Server RedirectUrl
 redirect s surl = do
                   liftIO $ putStrLn $ "GET /" ++ show surl
                   lurl <- liftIO $ Store.shortToLong s surl
+                  liftIO $ putStrLn $ "-> " ++ show lurl
                   case lurl of
                        Just lurl' -> return $ addHeader lurl' undefined
                        Nothing -> throwError err404
