@@ -1,4 +1,4 @@
-FROM haskell:7
+FROM haskell:9
 MAINTAINER Alex Brandt <alunduil@alunduil.com>
 
 EXPOSE 8000
